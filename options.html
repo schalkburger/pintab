@@ -48,7 +48,7 @@
           <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template"></div>
 
           <!-- The 'add' button -->
-          <div class="js-add-template-text btn btn-primary btn-add-new-rule" data-template-name="rule-template" data-target="#js-rule-container">Add New Rule</div>
+          <div class="js-add-template-text btn btn-default btn-add-new-rule" data-template-name="rule-template" data-target="#js-rule-container">Add New Rule</div>
         </div>
 
         <!-- The advanced accordion -->
@@ -57,7 +57,9 @@
             <div class="panel panel-default">
               <div class="panel-heading" role="tab" id="heading-advanced">
                 <h4 class="panel-title">
-                  <a data-toggle="collapse" data-parent="#accordion-advanced" href="#accordion-panel-advanced" aria-expanded="false" aria-controls="accordion-panel-advanced"> Advanced </a>
+                  <a data-toggle="collapse" class="advanced-panel" data-parent="#accordion-advanced" href="#accordion-panel-advanced" aria-expanded="false" aria-controls="accordion-panel-advanced">
+                    Advanced
+                  </a>
                 </h4>
               </div>
               <div id="accordion-panel-advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-advanced">
@@ -160,7 +162,7 @@
               <h4 class="modal-title">Confirm Reset</h4>
             </div>
             <div class="modal-body">
-              <p class="alert alert-danger">Resetting options will overrite your existing setings</p>
+              <p class="alert alert-danger">Resetting options will overwrite your existing settings</p>
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
@@ -224,7 +226,7 @@
             </div>
 
             <div class="row">
-                <div class="col-lg-10 col-lg-offset-1">
+                <div class="col-lg-12">
                     <hr/>
                 </div>
             </div>
