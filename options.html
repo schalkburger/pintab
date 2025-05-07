@@ -1,0 +1,243 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles/thirdparty.css" />
+
+    <link rel="stylesheet" href="styles/options.css" />
+    <title>PinTab Options</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- The form -->
+      <form role="form" class="form-horizontal settings-container">
+        <!--Overall instructions-->
+        <div class="alert alert-info instruction">
+          <div>
+            You can specify tabs to automatically pin by regular expressions based on the URL. If you do not know what a regular expression is, simply put in the URL you want to automatically pin.
+          </div>
+
+          <div class="newline">
+            In the <a href="chrome://extensions">extension manager</a>, click on "Configure Commands" to assign a keyboard shortcut (such as Alt-P) to the plugin to easily toggle pinned state.
+          </div>
+
+          <div class="newline">
+            You can specify http AND https with the same rule by using regular expression quantifiers. Example:
+            <div class="example">^http[s]{0,1}://www.facebook.com/$</div>
+          </div>
+        </div>
+
+        <!--Regular expressions-->
+        <div class="simple-border">
+          <div class="alert alert-success instruction">
+            <div>
+              This is where you define the URLs you wish to pin. These rules have two components, the <i>regular expression</i> and the <i>rule name</i>. The regular expression defines what content is
+              filtered and the rule name is simply a label to identify which rule matched filtered content. By default, the rule name is displayed in the notification of any post which matches.
+            </div>
+            <div class="newline">
+              The optional <i>Tab Index</i> field allows you to specify how many tabs, from the left, you wish this tab to be located. For instance, a value of 0 will place the tab all the way to the
+              left (since it will be 0 tabs in from the left). A value of 2 will place the tab as the third tab from the left.
+            </div>
+            <div class="newline">
+              If the <i>disable</i> checkbox is checked, the rule will be disabled. Consequently, tabs matching the regular expression for this rule will not be pinned by this rule. However, if a tab
+              matches this regular expression <b>and</b> a regular expression in another rule, the tab is may be pinned.
+            </div>
+          </div>
+
+          <!-- The rule container button -->
+          <!-- TODO: Change regexes => rules -->
+          <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template"></div>
+
+          <!-- The 'add' button -->
+          <div class="js-add-template-text btn btn-primary btn-add-new-rule" data-template-name="rule-template" data-target="#js-rule-container">Add New Rule</div>
+        </div>
+
+        <!-- The advanced accordion -->
+        <div class="accordion-container">
+          <div class="panel-group" id="accordion-advanced" role="tablist" aria-multiselectable="false">
+            <div class="panel panel-default">
+              <div class="panel-heading" role="tab" id="heading-advanced">
+                <h4 class="panel-title">
+                  <a data-toggle="collapse" data-parent="#accordion-advanced" href="#accordion-panel-advanced" aria-expanded="false" aria-controls="accordion-panel-advanced"> Advanced </a>
+                </h4>
+              </div>
+              <div id="accordion-panel-advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-advanced">
+                <div class="panel-body">
+                  <div class="form-group">
+                    <!--"Open in new Tab" to be pinned-->
+                    <div class="col-lg-10">
+                      <div class="checkbox">
+                        <label><input type="checkbox" id="pin-open-in-new" data-setting-type="boolean" data-setting-name="pin-open-in-new" /> Pin tabs opened by "Open in new Tab"</label>
+                        <span
+                          class="hint-icon glyphicon glyphicon-info-sign"
+                          aria-hidden="true"
+                          data-toggle="tooltip"
+                          data-placement="right"
+                          title="Automatically pin all tables opened with control-click or right-click and selecting 'Open link in new tab' [EXPERIMENTAL]"
+                        ></span>
+                      </div>
+                    </div>
+
+                    <!--Release to right-->
+                    <div class="col-lg-10">
+                      <div class="checkbox">
+                        <label><input type="checkbox" id="release-to-right" data-setting-type="boolean" data-setting-name="release-to-right" /> Unpin tabs to the right</label>
+                        <span
+                          class="hint-icon glyphicon glyphicon-info-sign"
+                          aria-hidden="true"
+                          data-toggle="tooltip"
+                          data-placement="right"
+                          title="Move unpinned tabs all the way to the right"
+                        ></span>
+                      </div>
+                    </div>
+
+                    <!--Pin new tab-->
+                    <div class="col-lg-10">
+                      <div class="checkbox">
+                        <label><input type="checkbox" id="pin-new-tab" data-setting-type="boolean" data-setting-name="pin-new-tab" /> Pin new tabs</label>
+                        <span
+                          class="hint-icon glyphicon glyphicon-info-sign"
+                          aria-hidden="true"
+                          data-toggle="tooltip"
+                          data-placement="right"
+                          title="Automatically pin all new tabs opened with control-t or the new tab button"
+                        ></span>
+                      </div>
+                    </div>
+
+                    <!--Debug mode-->
+                    <div class="col-lg-10">
+                      <div class="checkbox">
+                        <label><input type="checkbox" id="debug" data-setting-type="boolean" data-setting-name="debug" /> Debug mode</label>
+                        <span
+                          class="hint-icon glyphicon glyphicon-info-sign"
+                          aria-hidden="true"
+                          data-toggle="tooltip"
+                          data-placement="right"
+                          title="This setting will enable console output for debugging purposes."
+                        ></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- The buttons -->
+        <div class="button-container button-container-save-reset">
+          <div class="btn btn-primary btn-save" id="js-save-button">Save</div>
+          <div class="btn btn-danger btn-reset" id="js-reset-button">Reset</div>
+        </div>
+      </form>
+    </div>
+
+    <!-- // The modals -->
+    <div>
+      <div id="js-settings-saved-modal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Settings Saved</h4>
+            </div>
+            <div class="modal-body">
+              <p>Your settings have been saved!</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="js-settings-confirm-reset-modal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Confirm Reset</h4>
+            </div>
+            <div class="modal-body">
+              <p class="alert alert-danger">Resetting options will overrite your existing setings</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-danger" id="js-confirm-reset-button">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="js-settings-reset-modal" class="modal fade">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Settings Reset</h4>
+            </div>
+            <div class="modal-body">
+              <p>Your settings have been reset!</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Templates -->
+    <div>
+      <script type="text/x-template-manager" data-name="rule-template">
+        <div class="_simple-border _form-group" id="js-rule-id-${rule-id}" data-setting-array-id="${rule-id}" data-setting-object-element data-setting-object-member-validate="empty(field[regex]):ignore">
+
+            <div class="row">
+                <label for="js-form-name-${rule-id}" class="control-label col-lg-2">Rule Name</label>
+                <div class="col-lg-3">
+                    <!--//TODO: Rename comment-> name-->
+                    <input type="text" id="js-form-name-${rule-id}" class="form-control col-lg-2" data-setting-object-member="comment"/>
+                </div>
+
+                <label for="js-form-regex-${rule-id}" class="control-label col-lg-2">Regular Expression</label>
+                <div class="col-lg-3">
+                    <input type="text" id="js-form-regex-${rule-id}" class="form-control" data-setting-object-member="regex" data-setting-object-member-validate="empty(value):ignore"/>
+                </div>
+
+                <div class="col-lg-2 pull-right">
+                    <div class="btn btn-danger js-remove-button" data-target-selector="#js-rule-id-${rule-id}">Remove</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="js-form-index-${rule-id}" class="control-label col-lg-2">Tab Index</label>
+                <div class="col-lg-1">
+                    <input type="number" id="js-form-index-${rule-id}" data-setting-type="number" min="0" class="form-control col-lg-2" data-setting-object-member="index"/>
+                </div>
+
+                <div class="col-lg-1 col-lg-offset-7">
+                    <div class="checkbox">
+                        <label><input type="checkbox" id="js-form-enable-${rule-id}" data-setting-type="boolean" data-setting-object-member="disable"> Disable</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-10 col-lg-offset-1">
+                    <hr/>
+                </div>
+            </div>
+
+        </div>
+      </script>
+    </div>
+
+    <!-- Scripts -->
+    <div>
+      <script src="scripts/thirdparty.js"></script>
+
+      <script src="scripts/vendor.js"></script>
+    </div>
+  </body>
+</html>
