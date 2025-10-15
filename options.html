@@ -17,24 +17,25 @@
     <div class="container max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <form role="form" class="settings-container space-y-8">
         <div class="space-y-4">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Instructions</h2>
+          <h2 class="text-2xl font-semibold text-gray-900 dark:text-white flex gap-x-4 items-center"><img src="images/icon-32x32.png" class="w-auto h-fit" alt="PinTab Icon" /> PinTab Options</h2>
           <div class="bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-8 space-y-3 text-sm">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Instructions</h2>
             <p>Automatically pin tabs by defining rules based on their URL. If you're unfamiliar with regular expressions, you can simply use the full URL you want to pin.</p>
+            <p>
+              Use regex patterns like <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">^https?://chat\.deepseek\.com/</code> to match
+              URLs. This pattern catches all DeepSeek chat pages including those with additional paths, not just the homepage.
+            </p>
             <p>
               To toggle the pinned state of the current tab, you can set a keyboard shortcut. Go to the
               <a href="chrome://extensions/shortcuts" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline dark:text-blue-400">Chrome Extension Shortcuts</a>
               page and assign a command (e.g., Alt+P).
-            </p>
-            <p>
-              To match both http and https, use <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">http[s]?</code> or
-              <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">^http[s]{0,1}://www.facebook.com/$</code>.
             </p>
           </div>
         </div>
 
         <div class="space-y-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">URL Pinning Rules</h2>
-          <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-600 text-green-800 dark:text-green-200 p-4 rounded-md space-y-2 text-sm">
+          <div class="bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-500 dark:border-cyan-600 text-cyan-400 dark:text-cyan-100 p-4 rounded-none space-y-2 text-sm">
             <p>Each rule has two main parts: a <b class="font-semibold">Rule Name</b> for identification and a <b class="font-semibold">Regular Expression</b> to match a URL.</p>
             <p>
               The optional <b class="font-semibold">Tab Position</b> field specifies the tab's location from the left (e.g., '0' is the first tab, '2' is the third). If left empty, it defaults to the
@@ -152,7 +153,7 @@
                 <input
                   type="text"
                   id="js-form-name-${rule-id}"
-                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   data-setting-object-member="name"
                 />
               </div>
@@ -161,7 +162,7 @@
                 <input
                   type="text"
                   id="js-form-regex-${rule-id}"
-                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                   data-setting-object-member="regex"
                   data-setting-object-member-validate="empty(value):ignore"
                 />
@@ -176,7 +177,7 @@
                   id="js-form-index-${rule-id}"
                   min="0"
                   placeholder="e.g., 0"
-                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-2 bg-white dark:bg-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center appearance-auto"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-2 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center appearance-auto"
                   data-setting-type="number"
                   data-setting-object-member="index"
                 />
