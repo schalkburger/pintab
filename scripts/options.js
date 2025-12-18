@@ -159,7 +159,98 @@ const initializeSaveFeedback = () => {
   }
 };
 
-// --- 3. Initialization ---
+// --- 3. Import/Export Rules Logic ---
+
+/**
+ * Exports the current URL Pinning Rules as a JSON file.
+ */
+const handleExportRules = () => {
+  chrome.storage.sync.get("regexes", (data) => {
+    const rules = data.regexes || [];
+    const json = JSON.stringify(rules, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    chrome.downloads.download({
+      url: url,
+      filename: "pintab_rules.json",
+      saveAs: true,
+    });
+  });
+};
+
+/**
+ * Handles the import of URL Pinning Rules from a JSON file.
+ * Validates the JSON, replaces existing rules in storage, shows a toast, and reloads the page.
+ * @param {Event} event - The change event from the file input.
+ */
+const handleImportRules = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const importedRules = JSON.parse(e.target.result);
+
+      // Basic validation: Must be an array
+      if (!Array.isArray(importedRules)) {
+        throw new Error("Invalid format: Must be an array of rules.");
+      }
+
+      // Validate each rule
+      for (let rule of importedRules) {
+        if (typeof rule !== "object" || !rule.regex || typeof rule.regex !== "string") {
+          throw new Error('Invalid rule: Each rule must have a "regex" string.');
+        }
+        if (rule.name && typeof rule.name !== "string") {
+          throw new Error('Invalid rule: "name" must be a string.');
+        }
+        if (rule.index !== undefined && typeof rule.index !== "number") {
+          throw new Error('Invalid rule: "index" must be a number.');
+        }
+        if (rule.disable !== undefined && typeof rule.disable !== "boolean") {
+          throw new Error('Invalid rule: "disable" must be a boolean.');
+        }
+        // No additional properties allowed (strict schema)
+        const allowedKeys = ["name", "regex", "index", "disable"];
+        for (let key in rule) {
+          if (!allowedKeys.includes(key)) {
+            throw new Error(`Invalid rule: Unknown property "${key}".`);
+          }
+        }
+      }
+
+      // Replace existing rules in storage
+      chrome.storage.sync.set({ regexes: importedRules }, () => {
+        createToastAlert("Rules imported successfully! Reloading...", "success");
+        // Reload the page to refresh the form with new rules
+        setTimeout(() => location.reload(), 1500);
+      });
+    } catch (err) {
+      createToastAlert("Import failed: " + err.message, "error");
+    }
+  };
+  reader.readAsText(file);
+};
+
+/**
+ * Initializes the event listeners for import and export buttons.
+ */
+const initializeImportExport = () => {
+  const exportButton = document.getElementById("js-export-button");
+  if (exportButton) {
+    exportButton.addEventListener("click", handleExportRules);
+  }
+
+  const importButton = document.getElementById("js-import-button");
+  const importFile = document.getElementById("js-import-file");
+  if (importButton && importFile) {
+    importButton.addEventListener("click", () => importFile.click());
+    importFile.addEventListener("change", handleImportRules);
+  }
+};
+
+// --- 4. Initialization ---
 
 /**
  * Runs all initial setup functions once the DOM is fully loaded.
@@ -167,6 +258,7 @@ const initializeSaveFeedback = () => {
 const initializeOptionsPage = () => {
   initializeAdvancedSettingsToggle();
   initializeSaveFeedback();
+  initializeImportExport();
 };
 
 // Wait for the DOM to be fully loaded before running initialization code

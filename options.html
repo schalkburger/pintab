@@ -36,12 +36,12 @@
         <div class="space-y-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">URL Pinning Rules</h2>
           <div class="bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-500 dark:border-cyan-600 text-cyan-400 dark:text-cyan-100 p-4 rounded-none space-y-2 text-sm">
-            <p>Each rule has two main parts: a <b class="font-semibold">Rule Name</b> for identification and a <b class="font-semibold">Regular Expression</b> to match a URL.</p>
-            <p>
+            <div>Each rule has two main parts: a <b class="font-semibold">Rule Name</b> for identification and a <b class="font-semibold">Regular Expression</b> to match a URL.</div>
+            <div>
               The optional <b class="font-semibold">Tab Position</b> field specifies the tab's location from the left (e.g., '0' is the first tab, '2' is the third). If left empty, it defaults to the
               end.
-            </p>
-            <p>Checking the <b class="font-semibold">Disable</b> box will deactivate the rule. Note that a URL could still be pinned if it matches another active rule.</p>
+            </div>
+            <div>Checking the <b class="font-semibold">Disable</b> box will deactivate the rule. Note that a URL could still be pinned if it matches another active rule.</div>
           </div>
 
           <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template" class="space-y-6 pt-4"></div>
@@ -55,6 +55,19 @@
               Add New Rule
             </div>
           </div>
+
+          <!-- New Import/Export Buttons -->
+          <div class="flex justify-center gap-4 pt-4">
+            <div id="js-export-button" class="btn btn-default btn-export-rules bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
+              Export Rules
+            </div>
+            <div id="js-import-button" class="btn btn-default btn-import-rules bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
+              Import Rules
+            </div>
+          </div>
+
+          <!-- Hidden file input for import -->
+          <input type="file" id="js-import-file" accept=".json" class="hidden" />
         </div>
 
         <div class="accordion-container">
@@ -157,7 +170,7 @@
                   data-setting-object-member="name"
                 />
               </div>
-             <div class="col-span-2">
+              <div class="col-span-2">
                 <label for="js-form-regex-${rule-id}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Regular Expression (URL)</label>
                 <input
                   type="text"
