@@ -22,9 +22,10 @@
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Instructions</h2>
             <p>Automatically pin tabs by defining rules based on their URL. If you're unfamiliar with regular expressions, you can simply use the full URL you want to pin.</p>
             <p>
-              Use regex patterns like <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">^https?://chat\.deepseek\.com/</code> to match
-              URLs. This pattern catches all DeepSeek chat pages including those with additional paths, not just the homepage.
+              A common regex pattern that you can use is
+              <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">^https?://chat\.deepseek\.com/</code>.
             </p>
+            <p>This pattern catches all DeepSeek chat pages including those with additional paths, not just the homepage.</p>
             <p>
               To toggle the pinned state of the current tab, you can set a keyboard shortcut. Go to the
               <a href="chrome://extensions/shortcuts" target="_blank" rel="noopener noreferrer" class="text-blue-500 hover:underline dark:text-blue-400">Chrome Extension Shortcuts</a>
@@ -46,23 +47,25 @@
 
           <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template" class="space-y-6 pt-4"></div>
 
-          <div class="flex justify-center pt-4">
+          <div class="flex justify-between pt-4 border-t border-t-slate-600 pt-10">
             <div
-              class="js-add-template-text btn btn-default btn-add-new-rule bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors"
+              class="js-add-template-text btn btn-default btn-add-new-rule bg-green-700 hover:bg-green-800 text-white font-bold py-4 px-12 rounded-lg cursor-pointer transition-colors text-base"
               data-template-name="rule-template"
               data-target="#js-rule-container"
             >
               Add New Rule
             </div>
-          </div>
-
-          <!-- New Import/Export Buttons -->
-          <div class="flex justify-center gap-4 pt-4">
-            <div id="js-export-button" class="btn btn-default btn-export-rules bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
-              Export Rules
-            </div>
-            <div id="js-import-button" class="btn btn-default btn-import-rules bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
-              Import Rules
+            <div id="js-save-button" class="col-span-1">
+              <button
+                type="submit"
+                id="js-save-button"
+                class="btn btn-primary js-save-button bg-blue-600 hover:bg-blue-700 text-white text-base font-bold w-full py-4 px-10 rounded-lg cursor-pointer transition-colors"
+                tabindex="0"
+                role="button"
+                aria-label="Save all settings"
+              >
+                Save Settings
+              </button>
             </div>
           </div>
 
@@ -73,11 +76,11 @@
         <div class="accordion-container">
           <div class="panel-group" id="accordion-advanced" role="tablist" aria-multiselectable="false">
             <div class="panel panel-default bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <div class="panel-heading p-4 cursor-pointer" role="tab" id="heading-advanced">
-                <h4 class="panel-title">
+              <div class="panel-heading p-6 pb-0 cursor-pointer" role="tab" id="heading-advanced">
+                <h4 class="panel-title border-b border-b-slate-600 pb-4">
                   <a
                     data-toggle="collapse"
-                    class="advanced-panel text-lg font-semibold text-gray-900 dark:text-white"
+                    class="advanced-panel text-xl font-semibold text-gray-900 dark:text-white"
                     data-parent="#accordion-advanced"
                     aria-expanded="false"
                     aria-controls="accordion-panel-advanced"
@@ -87,62 +90,53 @@
                 </h4>
               </div>
               <div id="" class="" role="tabpanel" aria-labelledby="heading-advanced">
-                <div class="panel-body p-4 border-t border-gray-200 dark:border-gray-700">
-                  <div class="space-y-4">
-                    <div class="flex items-center">
-                      <input
-                        id="pin-open-in-new"
-                        type="checkbox"
-                        data-setting-type="boolean"
-                        data-setting-name="pin-open-in-new"
-                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label for="pin-open-in-new" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin tabs opened via "Open in new Tab"</label>
+                <div class="panel-body p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="space-y-4">
+                      <div class="flex items-center">
+                        <input
+                          id="pin-open-in-new"
+                          type="checkbox"
+                          data-setting-type="boolean"
+                          data-setting-name="pin-open-in-new"
+                          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label for="pin-open-in-new" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin tabs opened via "Open in new Tab"</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="release-to-right"
+                          type="checkbox"
+                          data-setting-type="boolean"
+                          data-setting-name="release-to-right"
+                          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label for="release-to-right" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Move unpinned tabs to the right</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="pin-new-tab" type="checkbox" data-setting-type="boolean" data-setting-name="pin-new-tab" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label for="pin-new-tab" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin all new tabs (Ctrl+T)</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="debug" type="checkbox" data-setting-type="boolean" data-setting-name="debug" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label for="debug" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Enable debug mode (console output)</label>
+                      </div>
                     </div>
-                    <div class="flex items-center">
-                      <input
-                        id="release-to-right"
-                        type="checkbox"
-                        data-setting-type="boolean"
-                        data-setting-name="release-to-right"
-                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label for="release-to-right" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Move unpinned tabs to the right</label>
-                    </div>
-                    <div class="flex items-center">
-                      <input id="pin-new-tab" type="checkbox" data-setting-type="boolean" data-setting-name="pin-new-tab" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <label for="pin-new-tab" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin all new tabs (Ctrl+T)</label>
-                    </div>
-                    <div class="flex items-center">
-                      <input id="debug" type="checkbox" data-setting-type="boolean" data-setting-name="debug" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-                      <label for="debug" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Enable debug mode (console output)</label>
+                    <div>
+                      <!-- New Import/Export Buttons -->
+                      <div class="export-import flex justify-end gap-4 pt-0">
+                        <div id="js-export-button" class="btn btn-default btn-export-rules bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
+                          Export Rules
+                        </div>
+                        <div id="js-import-button" class="btn btn-default btn-import-rules bg-slate-600 hover:bg-slate-700 text-white font-bold py-2 px-6 rounded-lg cursor-pointer transition-colors">
+                          Import Rules
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="button-container button-container-save-reset flex flex-col justify-center items-center gap-4 pt-4 w-full grid grid-cols-3">
-          <div id="js-save-button" class="col-span-2">
-            <button
-              type="submit"
-              id="js-save-button"
-              class="btn btn-primary js-save-button bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold w-full py-3 px-4 rounded-lg cursor-pointer transition-colors"
-              tabindex="0"
-              role="button"
-              aria-label="Save all settings"
-            >
-              Save Settings
-            </button>
-          </div>
-
-          <div
-            id="js-reset-button"
-            class="col-span-1 btn btn-danger btn-reset w-full bg-transparent hover:bg-transparent hover:text-slate-500 hover:border-slate-500 border border-slate-700 text-slate-600 font-bold text-lg py-3 px-4 rounded-lg cursor-pointer text-center transition-colors"
-          >
-            Reset
           </div>
         </div>
       </form>
@@ -210,7 +204,7 @@
 
               <div>
                 <div
-                  class="btn btn-danger js-remove-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg cursor-pointer transition-colors text-center"
+                  class="btn btn-danger js-remove-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-sm cursor-pointer transition-colors text-center text-xs"
                   data-target-selector="#js-rule-id-${rule-id}"
                 >
                   Remove
