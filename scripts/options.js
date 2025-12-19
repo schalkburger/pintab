@@ -124,27 +124,12 @@ const createToastAlert = (message, type) => {
  * @param {SubmitEvent} event - The form submit event object.
  */
 const handleFormSubmit = (event) => {
-  // Assuming the original logic (in thirdparty.js) runs on submit and handles the saving.
-  // We simply wait a short time to simulate a successful save before showing the toast.
-  // For a real-world scenario, you would call createToastAlert *inside* the success
-  // callback of your actual settings saving function.
-
-  // The existing thirdparty.js uses jQuery's $(document).ready() and attaches a submit
-  // handler to the form. We will let that handler run, which prevents the default.
-  // We will attach an event listener to the form's 'submit' event.
-  // If the thirdparty.js logic prevents the default and handles saving, this listener
-  // should still fire. We'll use a timeout to ensure the save is 'complete' first.
-
-  // Prevent default submit in this *new* handler to be safe, though thirdparty.js likely does this.
-  // If thirdparty.js is not preventing default, the page would reload.
-  // We'll rely on the existing logic to handle the save.
   event.preventDefault();
 
-  // Simulate save delay before showing toast
-  // NOTE: In a clean implementation, this call would be inside the success handler of the save function.
   setTimeout(() => {
     createToastAlert("Settings successfully saved!", "success");
-  }, 100); // Small delay to simulate async save operation
+    clearUnsavedChanges(); // ← Just add this one line
+  }, 100);
 };
 
 /**
@@ -250,6 +235,80 @@ const initializeImportExport = () => {
   }
 };
 
+// --- 5. Unsaved Changes Detection ---
+
+let hasUnsavedChanges = false;
+
+/**
+ * Marks the form as having unsaved changes.
+ */
+const markUnsavedChanges = () => {
+  hasUnsavedChanges = true;
+};
+
+/**
+ * Clears the unsaved changes flag (called after successful save).
+ */
+const clearUnsavedChanges = () => {
+  hasUnsavedChanges = false;
+};
+
+/**
+ * Handles the browser's beforeunload event to warn about unsaved changes.
+ * @param {BeforeUnloadEvent} event
+ */
+const handleBeforeUnload = (event) => {
+  if (hasUnsavedChanges) {
+    // Most browsers show a standard message; we just need to set returnValue
+    event.preventDefault();
+    event.returnValue = ""; // Required for Chrome to show the dialog
+    return ""; // Some browsers use this
+  }
+};
+
+/**
+ * Attaches listeners to detect changes in the form.
+ * This covers:
+ * - Input/checkbox changes (including advanced settings)
+ * - Rule addition/removal (via template system)
+ * - Import (which reloads anyway, but we'll mark as dirty if needed)
+ */
+const initializeUnsavedChangesDetection = () => {
+  const form = document.querySelector(".settings-container");
+
+  if (!form) return;
+
+  // 1. Listen for any input/change in static fields (checkboxes, etc.)
+  form.addEventListener("input", markUnsavedChanges);
+  form.addEventListener("change", markUnsavedChanges);
+
+  // 2. Detect rule additions (Add New Rule button)
+  const addRuleButton = document.querySelector(".js-add-template-text");
+  if (addRuleButton) {
+    addRuleButton.addEventListener("click", markUnsavedChanges);
+  }
+
+  // 3. Detect rule removals (Remove buttons are added dynamically)
+  // Use event delegation on the rule container
+  const ruleContainer = document.getElementById("js-rule-container");
+  if (ruleContainer) {
+    ruleContainer.addEventListener("click", (e) => {
+      if (e.target.closest(".js-remove-button")) {
+        markUnsavedChanges();
+      }
+    });
+  }
+
+  // 4. Import rules: technically changes data, but we reload anyway — still mark dirty
+  const importButton = document.getElementById("js-import-button");
+  if (importButton) {
+    importButton.addEventListener("click", markUnsavedChanges);
+  }
+
+  // 5. Attach beforeunload listener
+  window.addEventListener("beforeunload", handleBeforeUnload);
+};
+
 // --- 4. Initialization ---
 
 /**
@@ -259,6 +318,7 @@ const initializeOptionsPage = () => {
   initializeAdvancedSettingsToggle();
   initializeSaveFeedback();
   initializeImportExport();
+  initializeUnsavedChangesDetection();
 };
 
 // Wait for the DOM to be fully loaded before running initialization code
