@@ -1,123 +1,134 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="styles/thirdparty.css" />
-
-    <link rel="stylesheet" href="styles/options.css" />
     <title>PinTab Options</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="scripts/browser@4.js"></script>
+    <script src="scripts/options.js"></script>
+    <link rel="apple-touch-icon" sizes="128x128" href="images/icon-128x128.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="images/icon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="images/icon-16x16.png" />
   </head>
 
-  <body>
-    <div class="container">
-      <!-- The form -->
-      <form role="form" class="form-horizontal settings-container">
-        <!--Overall instructions-->
-        <div class="alert alert-info instruction">
-          <div>
-            You can specify tabs to automatically pin by regular expressions based on the URL. If you do not know what a regular expression is, simply put in the URL you want to automatically pin.
-          </div>
+  <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans">
+    <div id="js-toast-container" class="pointer-events-none fixed inset-0 z-50"></div>
 
-          <div class="newline">
-            In the <a href="chrome://extensions">extension manager</a>, click on "Configure Commands" to assign a keyboard shortcut (such as Alt-P) to the plugin to easily toggle pinned state.
-          </div>
-
-          <div class="newline">
-            You can specify http AND https with the same rule by using regular expression quantifiers. Example:
-            <div class="example">^http[s]{0,1}://www.facebook.com/$</div>
+    <div class="container max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+      <form role="form" class="settings-container space-y-8">
+        <div class="space-y-4">
+          <h1 class="text-2xl font-semibold text-gray-900 dark:text-white flex gap-x-4 items-center"><img src="images/icon-32x32.png" class="w-auto h-fit" alt="PinTab Icon" /> PinTab Options</h1>
+          <div class="bg-gray-100 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-8 space-y-3 text-sm">
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">Instructions</h2>
+            <p class="text-base">Automatically pin tabs using URL-based rules.</p>
+            <p class="text-base">If you're unfamiliar with regular expressions, just use the full URL you want to pin.</p>
+            <p class="text-base">
+              A common regex pattern that you can use is e.g.
+              <code class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded px-1.5 py-1 text-xs font-mono">^https?://gemini\.google\.com/</code>
+            </p>
+            <p class="text-base">This pattern matches all Gemini chat pages, not just the homepage.</p>
           </div>
         </div>
 
-        <!--Regular expressions-->
-        <div class="simple-border">
-          <div class="alert alert-success instruction">
-            <div>
-              This is where you define the URLs you wish to pin. These rules have two components, the <i>regular expression</i> and the <i>rule name</i>. The regular expression defines what content is
-              filtered and the rule name is simply a label to identify which rule matched filtered content. By default, the rule name is displayed in the notification of any post which matches.
+        <div class="space-y-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-8">
+          <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-6">URL Pinning Rules</h2>
+          <div class="bg-cyan-50 dark:bg-cyan-900/20 border-l-4 border-cyan-500 dark:border-cyan-600 text-cyan-400 dark:text-cyan-100 p-4 rounded-none space-y-2 text-sm">
+            <ul class="list-none list-outside pl-2 space-y-3 leading-6">
+              <li>Each rule has two main parts: a <b class="font-semibold">Rule Name</b> for identification and a <b class="font-semibold">Regular Expression</b> to match a URL.</li>
+              <li>
+                The optional <b class="font-semibold">Tab Position</b> field specifies the tab's location from the left (e.g., '0' is the first tab, '2' is the third). <br />If left empty, it defaults
+                to the end.
+              </li>
+              <li>Checking the <b class="font-semibold">Disable</b> box will deactivate the rule. Note that a URL could still be pinned if it matches another active rule.</li>
+            </ul>
+          </div>
+
+          <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template" class="space-y-6 pt-4"></div>
+
+          <div class="flex justify-between pt-4 border-t border-t-slate-600 pt-10">
+            <div
+              class="js-add-template-text btn btn-default btn-add-new-rule bg-teal-800 hover:bg-teal-700 text-white font-bold py-4 px-12 rounded-lg cursor-pointer transition-colors text-base"
+              data-template-name="rule-template"
+              data-target="#js-rule-container"
+            >
+              Add New Rule
             </div>
-            <div class="newline">
-              The optional <i>Tab Index</i> field allows you to specify how many tabs, from the left, you wish this tab to be located. For instance, a value of 0 will place the tab all the way to the
-              left (since it will be 0 tabs in from the left). A value of 2 will place the tab as the third tab from the left.
-            </div>
-            <div class="newline">
-              If the <i>disable</i> checkbox is checked, the rule will be disabled. Consequently, tabs matching the regular expression for this rule will not be pinned by this rule. However, if a tab
-              matches this regular expression <b>and</b> a regular expression in another rule, the tab is may be pinned.
+            <div id="js-save-button" class="col-span-1">
+              <button
+                type="submit"
+                id="js-save-button"
+                class="btn btn-primary js-save-button bg-cyan-800 hover:bg-cyan-700 text-white text-base font-bold w-full py-4 px-10 rounded-lg cursor-pointer transition-colors"
+                tabindex="0"
+                role="button"
+                aria-label="Save all settings"
+              >
+                Save Settings
+              </button>
             </div>
           </div>
 
-          <!-- The rule container button -->
-          <!-- TODO: Change regexes => rules -->
-          <div id="js-rule-container" data-setting-type="objectarray" data-setting-name="regexes" data-template-name="rule-template"></div>
-
-          <!-- The 'add' button -->
-          <div class="js-add-template-text btn btn-default btn-add-new-rule" data-template-name="rule-template" data-target="#js-rule-container">Add New Rule</div>
+          <!-- Hidden file input for import -->
+          <input type="file" id="js-import-file" accept=".json" class="hidden" />
         </div>
 
-        <!-- The advanced accordion -->
         <div class="accordion-container">
           <div class="panel-group" id="accordion-advanced" role="tablist" aria-multiselectable="false">
-            <div class="panel panel-default">
-              <div class="panel-heading" role="tab" id="heading-advanced">
-                <h4 class="panel-title">
-                  <a data-toggle="collapse" class="advanced-panel" data-parent="#accordion-advanced" href="#accordion-panel-advanced" aria-expanded="false" aria-controls="accordion-panel-advanced">
-                    Advanced
+            <div class="panel panel-default bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div class="panel-heading p-6 pb-0" role="tab" id="heading-advanced">
+                <h4 class="panel-title border-b border-b-slate-600 pb-4">
+                  <a
+                    data-toggle="collapse"
+                    class="advanced-panel text-xl font-semibold text-gray-900 dark:text-white"
+                    data-parent="#accordion-advanced"
+                    aria-expanded="false"
+                    aria-controls="accordion-panel-advanced"
+                  >
+                    Advanced Settings
                   </a>
                 </h4>
               </div>
-              <div id="accordion-panel-advanced" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading-advanced">
-                <div class="panel-body">
-                  <div class="form-group">
-                    <!--"Open in new Tab" to be pinned-->
-                    <div class="col-lg-10">
-                      <div class="checkbox">
-                        <label><input type="checkbox" id="pin-open-in-new" data-setting-type="boolean" data-setting-name="pin-open-in-new" /> Pin tabs opened by "Open in new Tab"</label>
-                        <span
-                          class="hint-icon glyphicon glyphicon-info-sign"
-                          aria-hidden="true"
-                          data-toggle="tooltip"
-                          data-placement="right"
-                          title="Automatically pin all tables opened with control-click or right-click and selecting 'Open link in new tab' [EXPERIMENTAL]"
-                        ></span>
+              <div id="" class="" role="tabpanel" aria-labelledby="heading-advanced">
+                <div class="panel-body p-6">
+                  <div class="grid grid-cols-1 md:grid-cols-2">
+                    <div class="space-y-4">
+                      <div class="flex items-center">
+                        <input
+                          id="pin-open-in-new"
+                          type="checkbox"
+                          data-setting-type="boolean"
+                          data-setting-name="pin-open-in-new"
+                          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label for="pin-open-in-new" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin tabs opened via "Open in new Tab"</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input
+                          id="release-to-right"
+                          type="checkbox"
+                          data-setting-type="boolean"
+                          data-setting-name="release-to-right"
+                          class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label for="release-to-right" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Move unpinned tabs to the right</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="pin-new-tab" type="checkbox" data-setting-type="boolean" data-setting-name="pin-new-tab" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label for="pin-new-tab" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Pin all new tabs (Ctrl+T)</label>
+                      </div>
+                      <div class="flex items-center">
+                        <input id="debug" type="checkbox" data-setting-type="boolean" data-setting-name="debug" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                        <label for="debug" class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Enable debug mode (console output)</label>
                       </div>
                     </div>
-
-                    <!--Release to right-->
-                    <div class="col-lg-10">
-                      <div class="checkbox">
-                        <label><input type="checkbox" id="release-to-right" data-setting-type="boolean" data-setting-name="release-to-right" /> Unpin tabs to the right</label>
-                        <span
-                          class="hint-icon glyphicon glyphicon-info-sign"
-                          aria-hidden="true"
-                          data-toggle="tooltip"
-                          data-placement="right"
-                          title="Move unpinned tabs all the way to the right"
-                        ></span>
-                      </div>
-                    </div>
-
-                    <!--Pin new tab-->
-                    <div class="col-lg-10">
-                      <div class="checkbox">
-                        <label><input type="checkbox" id="pin-new-tab" data-setting-type="boolean" data-setting-name="pin-new-tab" /> Pin new tabs</label>
-                        <span
-                          class="hint-icon glyphicon glyphicon-info-sign"
-                          aria-hidden="true"
-                          data-toggle="tooltip"
-                          data-placement="right"
-                          title="Automatically pin all new tabs opened with control-t or the new tab button"
-                        ></span>
-                      </div>
-                    </div>
-
-                    <!--Debug mode-->
-                    <div class="col-lg-10">
-                      <div class="checkbox">
-                        <label><input type="checkbox" id="debug" data-setting-type="boolean" data-setting-name="debug" /> Debug mode</label>
-                        <span
-                          class="hint-icon glyphicon glyphicon-info-sign"
-                          aria-hidden="true"
-                          data-toggle="tooltip"
-                          data-placement="right"
-                          title="This setting will enable console output for debugging purposes."
-                        ></span>
+                    <div>
+                      <!-- New Import/Export Buttons -->
+                      <div class="export-import flex justify-end gap-4 pt-0">
+                        <div id="js-export-button" class="btn btn-default btn-export-rules bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-lg cursor-pointer transition-colors">
+                          Export Rules
+                        </div>
+                        <div id="js-import-button" class="btn btn-default btn-import-rules bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-6 rounded-lg cursor-pointer transition-colors">
+                          Import Rules
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -126,119 +137,86 @@
             </div>
           </div>
         </div>
-
-        <!-- The buttons -->
-        <div class="button-container button-container-save-reset">
-          <div class="btn btn-primary btn-save" id="js-save-button">Save</div>
-          <div class="btn btn-danger btn-reset" id="js-reset-button">Reset</div>
-        </div>
       </form>
     </div>
 
-    <!-- // The modals -->
-    <div>
-      <div id="js-settings-saved-modal" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-              <h4 class="modal-title">Settings Saved</h4>
-            </div>
-            <div class="modal-body">
-              <p>Your settings have been saved!</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="hidden"></div>
 
-      <div id="js-settings-confirm-reset-modal" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-              <h4 class="modal-title">Confirm Reset</h4>
-            </div>
-            <div class="modal-body">
-              <p class="alert alert-danger">Resetting options will overwrite your existing settings</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-danger" id="js-confirm-reset-button">Reset</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="js-settings-reset-modal" class="modal fade">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-              <h4 class="modal-title">Settings Reset</h4>
-            </div>
-            <div class="modal-body">
-              <p>Your settings have been reset!</p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Templates -->
     <div>
       <script type="text/x-template-manager" data-name="rule-template">
-        <div class="_simple-border _form-group" id="js-rule-id-${rule-id}" data-setting-array-id="${rule-id}" data-setting-object-element data-setting-object-member-validate="empty(field[regex]):ignore">
-
-            <div class="row">
-                <label for="js-form-name-${rule-id}" class="control-label col-lg-2">Rule Name</label>
-                <div class="col-lg-3">
-                    <!--//TODO: Rename comment-> name-->
-                    <input type="text" id="js-form-name-${rule-id}" class="form-control col-lg-2" data-setting-object-member="comment"/>
-                </div>
-
-                <label for="js-form-regex-${rule-id}" class="control-label col-lg-2">Regular Expression</label>
-                <div class="col-lg-3">
-                    <input type="text" id="js-form-regex-${rule-id}" class="form-control" data-setting-object-member="regex" data-setting-object-member-validate="empty(value):ignore"/>
-                </div>
-
-                <div class="col-lg-2 pull-right">
-                    <div class="btn btn-danger js-remove-button" data-target-selector="#js-rule-id-${rule-id}">Remove</div>
-                </div>
+        <div
+          class="border-t border-gray-200 dark:border-gray-700 pt-6 pb-4"
+          id="js-rule-id-${rule-id}"
+          data-setting-array-id="${rule-id}"
+          data-setting-object-element
+          data-setting-object-member-validate="empty(field[regex]):ignore"
+        >
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="col-span-1">
+                <label for="js-form-name-${rule-id}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Rule Name</label>
+                <input
+                  type="text"
+                  id="js-form-name-${rule-id}"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  data-setting-object-member="name"
+                />
+              </div>
+              <div class="col-span-2">
+                <label for="js-form-regex-${rule-id}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Regular Expression (URL)</label>
+                <input
+                  type="text"
+                  id="js-form-regex-${rule-id}"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-3 px-4 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  data-setting-object-member="regex"
+                  data-setting-object-member-validate="empty(value):ignore"
+                />
+              </div>
             </div>
 
-            <div class="row">
-                <label for="js-form-index-${rule-id}" class="control-label col-lg-2">Tab Index</label>
-                <div class="col-lg-1">
-                    <input type="number" id="js-form-index-${rule-id}" data-setting-type="number" min="0" class="form-control col-lg-2" data-setting-object-member="index"/>
-                </div>
+            <div class="flex flex-col md:flex-row md:items-end md:gap-4 space-y-4 md:space-y-0">
+              <div class="w-full md:w-12">
+                <label for="js-form-index-${rule-id}" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-nowrap">Tab Position</label>
+                <input
+                  type="number"
+                  id="js-form-index-${rule-id}"
+                  min="0"
+                  placeholder="e.g., 0"
+                  class="form-control block w-full rounded-md border-gray-300 dark:border-gray-600 py-2 px-2 bg-white dark:bg-gray-800 border border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-center appearance-auto"
+                  data-setting-type="number"
+                  data-setting-object-member="index"
+                />
+              </div>
+              <div class="flex items-center md:pb-2">
+                <input
+                  type="checkbox"
+                  id="js-form-enable-${rule-id}"
+                  data-setting-type="boolean"
+                  data-setting-object-member="disable"
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <label for="js-form-enable-${rule-id}" class="ml-2 block text-sm text-gray-900 dark:text-gray-300">Disable</label>
+              </div>
 
-                <div class="col-lg-1 col-lg-offset-7">
-                    <div class="checkbox">
-                        <label><input type="checkbox" id="js-form-enable-${rule-id}" data-setting-type="boolean" data-setting-object-member="disable"> Disable</label>
-                    </div>
+              <div class="flex-grow"></div>
+
+              <div>
+                <div
+                  class="btn btn-danger js-remove-button bg-slate-800 hover:bg-orange-700 text-white font-bold py-2 px-2 rounded-sm cursor-pointer transition-colors text-center text-xs"
+                  data-target-selector="#js-rule-id-${rule-id}"
+                  title="Remove rule"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="rgba(255,255,255,1)"><path d="M7 6V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V6H22V8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8H2V6H7ZM9 4V6H15V4H9Z"></path></svg>
                 </div>
+              </div>
             </div>
-
-            <div class="row">
-                <div class="col-lg-12">
-                    <hr/>
-                </div>
-            </div>
-
+          </div>
         </div>
       </script>
     </div>
 
-    <!-- Scripts -->
     <div>
       <script src="scripts/thirdparty.js"></script>
-
       <script src="scripts/vendor.js"></script>
     </div>
   </body>
