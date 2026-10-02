@@ -95,8 +95,10 @@ const createToastAlert = (message, type) => {
   // Initial opacity set for the fade-in effect
   alertElement.style.opacity = "0";
 
-  // 3. Add content
-  alertElement.innerHTML = `${iconSvg}<p class="font-medium">${message}</p>`;
+  // 3. Add content. Icon is trusted static markup; message goes in as plain text
+  // so untrusted strings (e.g. imported rule property names) can't inject HTML.
+  alertElement.innerHTML = `${iconSvg}<p class="font-medium"></p>`;
+  alertElement.querySelector("p").textContent = message;
 
   // 4. Append and trigger fade-in
   toastContainer.appendChild(alertElement);
@@ -186,6 +188,12 @@ const handleImportRules = (event) => {
       for (let rule of importedRules) {
         if (typeof rule !== "object" || !rule.regex || typeof rule.regex !== "string") {
           throw new Error('Invalid rule: Each rule must have a "regex" string.');
+        }
+        // Regex must compile, otherwise the background worker crashes on it later
+        try {
+          new RegExp(rule.regex);
+        } catch (regexErr) {
+          throw new Error(`Invalid rule: Malformed regex "${rule.regex}" (${regexErr.message}).`);
         }
         if (rule.name && typeof rule.name !== "string") {
           throw new Error('Invalid rule: "name" must be a string.');

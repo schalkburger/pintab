@@ -146,8 +146,15 @@ const DEFAULT_OPTIONS = { regexes: [{ regex: "http[s]?://mail.google.com/", comm
   const OPTION_KEYS = { RULES: "regexes", OPEN_IN_NEW: "pin-open-in-new", PIN_NEW: "pin-new-tab", RELEASE_TO_RIGHT: "release-to-right" };
   const regexCache = {};
   function getRegex(pattern) {
-    if (!regexCache[pattern]) {
-      regexCache[pattern] = new RegExp(pattern);
+    if (!(pattern in regexCache)) {
+      try {
+        regexCache[pattern] = new RegExp(pattern);
+      } catch (err) {
+        // Bad pattern from storage: cache the failure so we never throw here,
+        // the rule just never matches.
+        console.warn("Invalid regex pattern, skipping rule:", pattern, err.message);
+        regexCache[pattern] = null;
+      }
     }
     return regexCache[pattern];
   }
@@ -210,7 +217,8 @@ const DEFAULT_OPTIONS = { regexes: [{ regex: "http[s]?://mail.google.com/", comm
     if (rules.length > 0) {
       for (let rule of rules) {
         tabInfo.rule = rule;
-        if (getRegex(rule.regex).test(tabInfo.tab.url || "")) {
+        const ruleRegex = getRegex(rule.regex);
+        if (ruleRegex && ruleRegex.test(tabInfo.tab.url || "")) {
           tabInfo.sourceModifiers[MODIFIER_TYPES.rule] = true;
           console.log("Pinning due to rule:", rule);
           callback(!rule.disable);
