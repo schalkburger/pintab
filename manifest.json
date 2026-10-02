@@ -1,7 +1,7 @@
 {
   "update_url": "https://clients2.google.com/service/update2/crx",
   "name": "__MSG_appName__",
-  "version": "1.4.0.0",
+  "version": "1.4.1.0",
   "manifest_version": 3,
   "description": "__MSG_appDescription__",
   "icons": {
@@ -18,7 +18,12 @@
     "default_icon": "images/icon-48x48.png"
   },
   "options_page": "options.html",
-  "permissions": ["tabs", "storage", "activeTab", "downloads"],
+  "permissions": [
+    "tabs",
+    "storage",
+    "activeTab",
+    "downloads"
+  ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   }
